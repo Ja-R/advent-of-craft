@@ -9,7 +9,7 @@ public record ExpirationDate(LocalDate value) {
         return new ExpirationDate(value);
     }
 
-    public boolean isOutdated(Supplier<LocalDate> now) {
+    public boolean isNotOutdated(Supplier<LocalDate> now) {
         return this.value.isAfter(now.get());
     }
 

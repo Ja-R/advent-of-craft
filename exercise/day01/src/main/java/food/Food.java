@@ -8,13 +8,13 @@ public record Food(ExpirationDate expirationDate,
                    InspectorId inspectorId) {
 
     public boolean isEdible(Supplier<LocalDate> now) {
-        return this.isOutdated(now) &&
+        return this.isFresh(now) &&
                 this.isApprovedForConsumption() &&
                 this.hasInspector();
     }
 
-    private boolean isOutdated(Supplier<LocalDate> now) {
-        return this.expirationDate.isOutdated(now);
+    private boolean isFresh(Supplier<LocalDate> now) {
+        return this.expirationDate.isNotOutdated(now);
     }
 
     private boolean isApprovedForConsumption() {
