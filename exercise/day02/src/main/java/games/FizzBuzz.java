@@ -17,15 +17,15 @@ public class FizzBuzz {
             throw new OutOfRangeException();
         }
 
-        if (isDivisibleByFizzAndBuzzNumbers(number)) {
+        if (isFizzBuzz(number)) {
             return FIZZ + BUZZ;
         }
 
-        if (isDivisibleByFizzNumber(number)) {
+        if (isFizz(number)) {
             return FIZZ;
         }
 
-        if (isDivisibleByBuzzNumber(number)) {
+        if (isBuzz(number)) {
             return BUZZ;
         }
 
@@ -36,15 +36,15 @@ public class FizzBuzz {
         return number <= MIN_RANGE || number > MAX_RANGE;
     }
 
-    private static boolean isDivisibleByFizzAndBuzzNumbers(Integer number) {
-        return isDivisibleByFizzNumber(number) && isDivisibleByBuzzNumber(number);
+    private static boolean isFizzBuzz(Integer number) {
+        return isFizz(number) && isBuzz(number);
     }
 
-    private static boolean isDivisibleByFizzNumber(Integer number) {
+    private static boolean isFizz(Integer number) {
         return isDivisibleBy(number, FIZZ_NUMBER);
     }
 
-    private static boolean isDivisibleByBuzzNumber(Integer number) {
+    private static boolean isBuzz(Integer number) {
         return isDivisibleBy(number, BUZZ_NUMBER);
     }
 
