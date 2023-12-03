@@ -1,19 +1,13 @@
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import people.Person;
-import people.Pet;
 import people.PetType;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
+import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulationTests {
@@ -44,9 +38,13 @@ class PopulationTests {
 
     @Test
     void whoOwnsTheYoungestPet() {
-        var filtered = population.stream().min(Comparator.comparingInt(person -> person.pets().stream().mapToInt(Pet::age).min().orElse(Integer.MAX_VALUE))).orElse(null);
+        Optional<String> result = population
+                .stream()
+                .min(comparing(Person::pets))
+                .map(Person::firstName);
 
-        assert filtered != null;
-        assertThat(filtered.firstName()).isEqualTo("Lois");
+        assertThat(result)
+                .isPresent()
+                .hasValue("Lois");
     }
 }
