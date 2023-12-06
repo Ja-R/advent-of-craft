@@ -28,7 +28,7 @@ public record Population(List<Person> persons) {
     private String formatPopulation() {
         return persons
                 .stream()
-                .map(Person::getInformation)
+                .map(Person::toString)
                 .collect(Collectors.joining(lineSeparator()));
     }
 }

@@ -10,7 +10,12 @@ public record Person(String firstName, String lastName, OwnedPets pets) {
         return this;
     }
 
-    public String getInformation() {
+    @Override
+    public String toString() {
+        return this.formatPerson();
+    }
+
+    public String formatPerson() {
         return this.hasPet()
                 ? "%s %s who owns : %s".formatted(this.firstName, this.lastName, this.getPetsNames())
                 : this.firstName + " " + this.lastName;
