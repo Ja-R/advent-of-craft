@@ -4,6 +4,8 @@ import ci.dependencies.Config;
 import ci.dependencies.Emailer;
 import ci.dependencies.Logger;
 import ci.dependencies.Project;
+import ci.dependencies.RunDeploymentStatus;
+import ci.dependencies.RunTestStatus;
 
 public class Pipeline {
     private final Config config;
@@ -17,47 +19,63 @@ public class Pipeline {
     }
 
     public void run(Project project) {
-        boolean testsPassed;
-        boolean deploySuccessful;
+        RunTestStatus runTestStatus = this.runTests(project);
+        RunDeploymentStatus runDeploymentStatus = this.runDeployment(project, runTestStatus);
+        this.notify(runTestStatus, runDeploymentStatus);
+    }
 
-        if (project.hasTests()) {
-            if ("success".equals(project.runTests())) {
-                log.info("Tests passed");
-                testsPassed = true;
-            } else {
-                log.error("Tests failed");
-                testsPassed = false;
-            }
-        } else {
+    private RunTestStatus runTests(Project project) {
+        if (project.doesNotHaveTest()) {
             log.info("No tests");
-            testsPassed = true;
+            return RunTestStatus.SUCCEED;
         }
 
-        if (testsPassed) {
-            if ("success".equals(project.deploy())) {
-                log.info("Deployment successful");
-                deploySuccessful = true;
-            } else {
-                log.error("Deployment failed");
-                deploySuccessful = false;
-            }
-        } else {
-            deploySuccessful = false;
+        if (project.runTestsSucceed()) {
+            log.info("Tests passed");
+            return RunTestStatus.SUCCEED;
         }
 
+        log.error("Tests failed");
+        return RunTestStatus.FAILED;
+    }
+
+    private RunDeploymentStatus runDeployment(Project project, RunTestStatus runTestStatus) {
+        if (RunTestStatus.FAILED.equals(runTestStatus)) {
+            return RunDeploymentStatus.FAILED;
+        }
+
+        if (project.runDeploymentSucceed()) {
+            log.info("Deployment successful");
+            return RunDeploymentStatus.SUCCEED;
+        }
+
+        log.error("Deployment failed");
+        return RunDeploymentStatus.FAILED;
+    }
+
+    private void notify(RunTestStatus runTestStatus, RunDeploymentStatus runDeploymentStatus) {
         if (config.sendEmailSummary()) {
-            log.info("Sending email");
-            if (testsPassed) {
-                if (deploySuccessful) {
-                    emailer.send("Deployment completed successfully");
-                } else {
-                    emailer.send("Deployment failed");
-                }
-            } else {
-                emailer.send("Tests failed");
-            }
-        } else {
-            log.info("Email disabled");
+            sendNotification(runTestStatus, runDeploymentStatus);
+            return;
         }
+
+        log.info("Email disabled");
+    }
+
+    private void sendNotification(RunTestStatus runTestStatus, RunDeploymentStatus runDeploymentStatus) {
+        log.info("Sending email");
+        if (RunTestStatus.SUCCEED.equals(runTestStatus)) {
+            String deploymentMessage = getDeploymentMessage(runDeploymentStatus);
+            emailer.send(deploymentMessage);
+            return;
+        }
+
+        emailer.send("Tests failed");
+    }
+
+    private String getDeploymentMessage(RunDeploymentStatus runDeploymentStatus) {
+        return RunDeploymentStatus.SUCCEED.equals(runDeploymentStatus)
+                ? "Deployment completed successfully"
+                : "Deployment failed";
     }
 }

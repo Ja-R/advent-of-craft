@@ -1,6 +1,9 @@
 package ci.dependencies;
 
 public class Project {
+    private static final String SUCCESS = "success";
+    private static final String FAILURE = "failure";
+
     private final boolean buildsSuccessfully;
     private final TestStatus testStatus;
 
@@ -13,16 +16,28 @@ public class Project {
         return new ProjectBuilder();
     }
 
-    public boolean hasTests() {
+    public boolean doesNotHaveTest() {
+        return !this.hasTests();
+    }
+
+    public boolean runTestsSucceed() {
+        return SUCCESS.equals(this.runTests());
+    }
+
+    public boolean runDeploymentSucceed() {
+        return SUCCESS.equals(this.deploy());
+    }
+
+    private boolean hasTests() {
         return testStatus != TestStatus.NO_TESTS;
     }
 
-    public String runTests() {
-        return testStatus == TestStatus.PASSING_TESTS ? "success" : "failure";
+    private String runTests() {
+        return testStatus == TestStatus.PASSING_TESTS ? SUCCESS : FAILURE;
     }
 
-    public String deploy() {
-        return buildsSuccessfully ? "success" : "failure";
+    private String deploy() {
+        return buildsSuccessfully ? SUCCESS : FAILURE;
     }
 
     public static class ProjectBuilder {
