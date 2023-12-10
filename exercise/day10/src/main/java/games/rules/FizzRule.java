@@ -1,17 +1,14 @@
 package games.rules;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 public class FizzRule implements FizzBuzzGameRule {
     @Override
-    public Predicate<Integer> match() {
-        return number -> this.isDivisibleBy(number, 3);
+    public boolean match(int number) {
+        return this.isDivisibleBy(number, 3);
     }
 
     @Override
-    public Supplier<String> convert() {
-        return () -> FIZZ;
+    public String convert() {
+        return FIZZ;
     }
 
 }

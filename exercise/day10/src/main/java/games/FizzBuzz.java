@@ -1,6 +1,7 @@
 package games;
 
 import games.rules.BuzzRule;
+import games.rules.FizzBuzzGameRule;
 import games.rules.FizzBuzzRule;
 import games.rules.FizzRule;
 
@@ -12,26 +13,26 @@ public class FizzBuzz {
 
     private FizzBuzz() {}
 
-    public static String convert(int input) {
-        validateNumber(input);
-        return convertSafely(input);
+    public static String convert(int number) {
+        validateNumber(number);
+        return convertSafely(number);
     }
 
-    private static void validateNumber(int input) {
-        if (isOutOfRange(input)) {
+    private static void validateNumber(int number) {
+        if (isOutOfRange(number)) {
             throw new OutOfRangeException();
         }
     }
 
-    private static boolean isOutOfRange(int input) {
-        return input <= MIN || input > MAX;
+    private static boolean isOutOfRange(int number) {
+        return number <= MIN || number > MAX;
     }
 
-    private static String convertSafely(int input) {
+    private static String convertSafely(int number) {
         return Stream.of(new FizzBuzzRule(), new FizzRule(), new BuzzRule())
-                .filter(rule -> rule.match().test(input))
+                .filter(rule -> rule.match(number))
                 .findFirst()
-                .map(rule -> rule.convert().get())
-                .orElseGet(() -> String.valueOf(input));
+                .map(FizzBuzzGameRule::convert)
+                .orElseGet(() -> String.valueOf(number));
     }
 }
