@@ -1,40 +1,37 @@
 package games;
 
+import games.rules.BuzzRule;
+import games.rules.FizzBuzzRule;
+import games.rules.FizzRule;
+
+import java.util.stream.Stream;
+
 public class FizzBuzz {
-    public static final int MIN = 0;
-    public static final int MAX = 100;
-    public static final int FIZZ = 3;
-    public static final int BUZZ = 5;
-    public static final int FIZZBUZZ = 15;
+    private static final int MIN = 0;
+    private static final int MAX = 100;
 
-    private FizzBuzz() {
-    }
+    private FizzBuzz() {}
 
-    public static String convert(Integer input) throws OutOfRangeException {
-        if (isOutOfRange(input)) {
-            throw new OutOfRangeException();
-        }
+    public static String convert(int input) {
+        validateNumber(input);
         return convertSafely(input);
     }
 
-    private static String convertSafely(Integer input) {
-        if (is(FIZZBUZZ, input)) {
-            return "FizzBuzz";
+    private static void validateNumber(int input) {
+        if (isOutOfRange(input)) {
+            throw new OutOfRangeException();
         }
-        if (is(FIZZ, input)) {
-            return "Fizz";
-        }
-        if (is(BUZZ, input)) {
-            return "Buzz";
-        }
-        return input.toString();
     }
 
-    private static boolean is(Integer divisor, Integer input) {
-        return input % divisor == 0;
-    }
-
-    private static boolean isOutOfRange(Integer input) {
+    private static boolean isOutOfRange(int input) {
         return input <= MIN || input > MAX;
+    }
+
+    private static String convertSafely(int input) {
+        return Stream.of(new FizzBuzzRule(), new FizzRule(), new BuzzRule())
+                .filter(rule -> rule.match().test(input))
+                .findFirst()
+                .map(rule -> rule.convert().get())
+                .orElseGet(() -> String.valueOf(input));
     }
 }
