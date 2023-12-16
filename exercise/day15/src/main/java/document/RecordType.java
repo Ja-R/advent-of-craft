@@ -11,7 +11,7 @@ public enum RecordType {
         this.value = value;
     }
 
-    public String getValue() {
-        return value;
+    public boolean hasName(String name) {
+        return this.name().equals(name);
     }
 }

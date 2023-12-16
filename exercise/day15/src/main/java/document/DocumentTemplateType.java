@@ -1,6 +1,7 @@
 package document;
 
-import static document.RecordType.ALL;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 public enum DocumentTemplateType {
     DEERPP("DEER", RecordType.INDIVIDUAL_PROSPECT),
@@ -20,23 +21,19 @@ public enum DocumentTemplateType {
     }
 
     public static DocumentTemplateType fromDocumentTypeAndRecordType(String documentType, String recordType) {
-        for (DocumentTemplateType dtt : DocumentTemplateType.values()) {
-            if (dtt.getDocumentType().equalsIgnoreCase(documentType)
-                    && dtt.getRecordType().equals(RecordType.valueOf(recordType))) {
-                return dtt;
-            } else if (dtt.getDocumentType().equalsIgnoreCase(documentType)
-                    && dtt.getRecordType().equals(ALL)) {
-                return dtt;
-            }
-        }
-        throw new IllegalArgumentException("Invalid Document template type or record type");
+        return Arrays.stream(DocumentTemplateType.values())
+                .filter(matchDocumentType(documentType))
+                .filter(matchRecordType(recordType))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Document template type or record type"));
     }
 
-    private RecordType getRecordType() {
-        return recordType;
+    private static Predicate<DocumentTemplateType> matchDocumentType(String documentType) {
+        return templateType -> templateType.documentType.equalsIgnoreCase(documentType);
     }
 
-    private String getDocumentType() {
-        return documentType;
+    private static Predicate<DocumentTemplateType> matchRecordType(String recordType) {
+        return templateType -> templateType.recordType.hasName(recordType);
     }
+
 }
